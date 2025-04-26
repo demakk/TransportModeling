@@ -11,4 +11,9 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TransportModeling.Application\TransportModeling.Application.csproj" />
+      <ProjectReference Include="..\TransportModeling.Infrastructure\TransportModeling.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

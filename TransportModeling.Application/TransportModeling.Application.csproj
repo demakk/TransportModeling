@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TransportModeling.Domain\TransportModeling.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
