@@ -10,4 +10,8 @@
       <ProjectReference Include="..\TransportModeling.Domain\TransportModeling.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="DTOs\User\" />
+    </ItemGroup>
+
 </Project>
