@@ -1,40 +1,64 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using TransportModeling.Application.DTOs.Auth;
+using TransportModeling.Application.Interfaces;
+using TransportModeling.Domain.Entities;
+using TransportModeling.Infrastructure.Data;
 
 namespace TransportModeling.Infrastructure.Services.Auth;
 
-public class AuthService
+public class AuthService : IAuthService
 {
+    private readonly AuthDbContext _db;
+    private readonly IPasswordHasher<User> _hasher;
     private readonly TokenService _tokenService;
+    private readonly IConfiguration _configuration;
 
-    // Для простоти: тимчасове сховище користувачів (потім замінимо на БД)
-    private static ConcurrentDictionary<string, (string Password, string Role)> _users = new();
-
-    public AuthService(TokenService tokenService)
+    public AuthService(AuthDbContext db, IPasswordHasher<User> hasher, TokenService tokenService, IConfiguration configuration)
     {
+        _db = db;
+        _hasher = hasher;
         _tokenService = tokenService;
+        _configuration = configuration;
     }
 
-    public bool Register(RegisterRequest request)
+    public async Task<string?> RegisterAsync(RegisterRequest request)
     {
-        if (_users.ContainsKey(request.Username))
-            return false; // Користувач вже існує
+        
+        if (await _db.Users.AnyAsync(u => u.Username == request.Username))
+            return null;
 
-        _users.TryAdd(request.Username, (request.Password, request.Role));
-        return true;
-    }
-
-    public string Login(LoginRequest request)
-    {
-        if (_users.TryGetValue(request.Username, out var userData))
+        var user = new User
         {
-            if (userData.Password == request.Password)
-            {
-                // Логін успішний
-                return _tokenService.CreateToken(Guid.NewGuid().ToString(), request.Username, userData.Role);
-            }
-        }
+            Username = request.Username,
+            Role = request.Role ?? "user",
+            PasswordHash = _hasher.HashPassword(null!, request.Password)
+        };
+        
+        
+        
 
-        return null;
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        return _tokenService.CreateToken(user.Id.ToString(), user.Username, user.Role);
+        
+    }
+
+    
+    
+    public async Task<string?> LoginAsync(LoginRequest request)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+        if (user == null)
+            return null;
+
+        var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+        if (result != PasswordVerificationResult.Success)
+            return null;
+
+        return _tokenService.CreateToken(user.Id.ToString(), user.Username, user.Role);
     }
 }

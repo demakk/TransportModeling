@@ -16,19 +16,19 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public IActionResult Register([FromBody] RegisterRequest request)
+    public async Task <IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var success = _authService.Register(request);
-        if (!success)
+        var token = await _authService.RegisterAsync(request);
+        if (token is null)
             return Conflict("Користувач з таким ім'ям вже існує.");
 
-        return Ok("Реєстрація успішна.");
+        return Ok(new RegisterResponse { Token = token });
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var token = _authService.Login(request);
+        var token = await _authService.LoginAsync(request);
         if (token == null)
             return Unauthorized("Невірний логін або пароль.");
 

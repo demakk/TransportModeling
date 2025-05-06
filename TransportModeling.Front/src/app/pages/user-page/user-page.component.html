@@ -1,0 +1,26 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <ng-container *ngIf="canAccessMainParts(); else noAccess">
+  <app-user-page-main-part
+    [title]="'Аналіз завантаженості транспорту'"
+    [description]="'Побудова графіків на основі усереднених даних.'"
+    [buttonText]="'Переглянути графіки'"
+    [isSelected]="selectedBlock === 'graphs'"
+    (clicked)="selectGraphs()"
+    [imageUrl]="'assets/graph-placeholder.svg'">
+  </app-user-page-main-part>
+
+  <app-user-page-main-part
+    [title]="'Моделювання випуску транспорту'"
+    [description]="'Оптимізація кількості транспорту з урахуванням обмежень.'"
+    [buttonText]="'Перейти до моделювання'"
+    [isSelected]="selectedBlock === 'modeling'"
+    (clicked)="selectModeling()"
+    [imageUrl]="'assets/modeling-placeholder.svg'">
+  </app-user-page-main-part>
+  </ng-container>
+  <ng-template #noAccess>
+    <p>У вас немає доступу до цих функцій.</p>
+  </ng-template>
+</div>

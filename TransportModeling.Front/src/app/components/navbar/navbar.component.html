@@ -1,0 +1,16 @@
+<nav class="navbar">
+  <div class="logo">
+    <img src="/logos/bus-logo.svg" alt="Логотип" />
+  </div>
+
+  <div class="nav-buttons">
+    <ng-container *ngIf="isAuthenticated; else guestMode">
+      <button (click)="editProfile()">Змінити дані</button>
+      <button (click)="logout()">Вийти</button>
+    </ng-container>
+
+    <ng-template #guestMode>
+      <button (click)="backToHome()">В початок</button>
+    </ng-template>
+  </div>
+</nav>

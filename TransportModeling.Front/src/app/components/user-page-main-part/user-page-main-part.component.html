@@ -1,0 +1,14 @@
+<div class="main-part" 
+     [class.hoverable]="true"
+     [class.selected]="isSelected"
+     (click)="clicked.emit()">
+  <div class="text-content">
+    <h3>{{ title }}</h3>
+    <p>{{ description }}</p>
+    <button>{{ buttonText }}</button>
+  </div>
+
+  <div class="image-content" *ngIf="imageUrl">
+    <img [src]="imageUrl" alt="Ілюстрація" />
+  </div>
+</div>

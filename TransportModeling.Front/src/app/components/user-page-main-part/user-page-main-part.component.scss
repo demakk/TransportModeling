@@ -1,0 +1,42 @@
+.main-part {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  
+    &.hoverable:hover {
+      background-color: #E0F2FE; /* блакитне підсвічування при наведенні */
+      box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+    }
+  
+    &.selected {
+      background-color: #DBEAFE; /* трохи сильніше блакитне підсвічування якщо вибрано */
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+    }
+  
+    .text-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .image-content {
+      flex-shrink: 0;
+      img {
+        width: 120px;
+        height: auto;
+      }
+    }
+  
+    button {
+      width: fit-content;
+    }
+  }
+  
