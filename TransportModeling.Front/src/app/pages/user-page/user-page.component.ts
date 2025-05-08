@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { UserPageMainPartComponent } from '../../components/user-page-main-part/user-page-main-part.component';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-page',
@@ -15,13 +16,14 @@ export class UserPageComponent {
   selectedBlock: 'graphs' | 'modeling' | null = null;
   
   role: string | null = null;
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
     this.role = this.authService.getUserRole();
     console.log("Role:   " + this.role)
   }
 
   selectGraphs() {
     this.selectedBlock = 'graphs';
+    this.router.navigate(['/transport-load']);
   }
 
   selectModeling() {

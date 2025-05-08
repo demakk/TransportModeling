@@ -6,6 +6,7 @@ using TransportModeling.Application.Interfaces;
 using TransportModeling.Domain.Entities;
 using TransportModeling.Infrastructure.Data;
 using TransportModeling.Infrastructure.Services.Auth;
+using TransportModeling.Infrastructure.Services.TransportGraph;
 
 namespace TransportModeling.Infrastructure.Extensions;
 
@@ -16,9 +17,12 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AuthDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
+        services.AddDbContext<TransportDbContext>(options =>
+            options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IGraphModelingService, GraphModelingService>();
 
         return services;
     }

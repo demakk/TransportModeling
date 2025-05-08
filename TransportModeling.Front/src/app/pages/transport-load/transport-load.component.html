@@ -1,0 +1,72 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <h1 class="text-center">Аналіз завантаженості транспорту</h1>
+
+  <ng-container *ngIf="canAccess(); else noAccess">
+
+    <div class="form-grid-2">
+      <div class="form-item">
+        <label for="routeInput">Маршрут</label>
+        <input id="routeInput" type="text" [(ngModel)]="routeName" placeholder="Наприклад: A41" />
+      </div>
+    
+      <div class="form-item">
+        <label for="periodSelect">Період доби</label>
+        <select id="periodSelect" [(ngModel)]="selectedPeriod">
+          <option *ngFor="let period of periods" [value]="period.value">
+            {{ period.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <!-- Додавання одного автобуса в чергу -->
+    <label>Додати автобус до черги рейсів</label>
+    <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+      <select [(ngModel)]="newVehicleType">
+        <option *ngFor="let type of vehicleTypes" [value]="type.id">
+          {{ type.name }} ({{ type.capacity }} місць)
+        </option>
+      </select>
+      <button (click)="addVehicleToQueue()">Додати до черги</button>
+    </div>
+
+    <!-- Черга рейсів -->
+    <div *ngIf="vehicleQueue.length > 0" style="margin-bottom: 20px;">
+      <h3>Черга автобусів:</h3>
+      <div class="vehicle-grid">
+        <div class="vehicle-card" *ngFor="let capacity of vehicleQueue; let i = index">
+          <div style="font-weight: 600;">Рейс {{ i + 1 }}</div>
+          <div>{{ capacity }} місць</div>
+          <button (click)="removeFromQueue(i)">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Побудова графіка -->
+    <button (click)="buildGraph()">Побудувати графік</button>
+
+    <!-- Вивід інтервалу -->
+    <div *ngIf="intervalText" class="interval-box">
+      {{ intervalText }}
+    </div>
+
+
+    <div style="margin-top: 40px;">
+      <h2 class="text-center">Графік завантаженості по зупинках</h2>
+      <div style="display: flex; gap: 16px; font-size: 14px; margin-bottom: 12px;">
+        <div><span style="color: #10B981;">●</span> Нормальне (до 70%)</div>
+        <div><span style="color: #FACC15;">●</span> Підвищене (70–89%)</div>
+        <div><span style="color: #EF4444;">●</span> Перевантаження (90–109%)</div>
+        <div><span style="color: #B91C1C;">●</span> Критичне (110%+)</div>
+      </div>
+      <div id="chartContainer" style="margin-top: 40px; width: 100%; max-width: none; padding: 0;">
+        <!-- canvas буде вставлено динамічно зі скролом -->
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noAccess>
+    <p class="text-center">У вас немає доступу до цієї сторінки. Будь ласка, увійдіть у систему.</p>
+  </ng-template>
+</div>
