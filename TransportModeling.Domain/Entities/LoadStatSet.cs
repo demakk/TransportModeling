@@ -1,4 +1,5 @@
-﻿using TransportModeling.Domain.Enums;
+﻿using System.Security.AccessControl;
+using TransportModeling.Domain.Enums;
 
 namespace TransportModeling.Domain.Entities;
 
@@ -18,6 +19,14 @@ public class LoadStatSet
     public int DurationMinutes { get; set; }
 
     public string DayType { get; set; } = null!;
+
+    public double AvgLoad { get; set; }
+
+    public double MaxPeakLoad { get; set; }
+
+    public int MaxIntervalMinutes { get; set; }
+    
+    
 
     public ICollection<LoadStat> Stats { get; set; } = new List<LoadStat>();
 }

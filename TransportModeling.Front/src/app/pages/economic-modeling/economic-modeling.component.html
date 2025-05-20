@@ -1,0 +1,51 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <h1 class="text-center">Економічне моделювання</h1>
+
+  <ng-container *ngIf="canAccess(); else noAccess">
+    <div class="form-grid-2">
+      <div class="form-item">
+        <label for="routeInput">Маршрут</label>
+        <input id="routeInput" type="text" [(ngModel)]="routeName" placeholder="Наприклад: A41" />
+      </div>
+
+      <div class="form-item">
+        <label for="periodSelect">Період доби</label>
+        <select id="periodSelect" [(ngModel)]="selectedPeriod">
+          <option *ngFor="let period of periods" [value]="period.value">{{ period.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <h3>Кількість автобусів по типах:</h3>
+    <div class="vehicle-grid">
+      <div class="vehicle-card" *ngFor="let type of vehicleTypes">
+        <div style="font-weight: 600;">{{ type.name }}</div>
+        <div>{{ type.capacity }} місць</div>
+        <input type="number" [(ngModel)]="type.count" min="0" placeholder="Кількість" />
+      </div>
+    </div>
+
+    <div class="text-center" style="margin-top: 24px">
+      <button (click)="runOptimization()">Почати моделювання</button>
+    </div>
+
+    <div *ngIf="result" class="interval-box">
+      <p><strong>Оптимальна конфігурація:</strong></p>
+      <ul>
+        <li *ngFor="let r of result.optimalConfig">
+          {{ r.count }} × {{ r.typeName }} ({{ r.capacity }} місць)
+        </li>
+      </ul>
+      <p>Середнє завантаження: {{ result.avgLoad }}%</p>
+      <p>Максимальне завантаження: {{ result.maxLoad }}%</p>
+      <p>Інтервал: {{ result.interval }} хв</p>
+      <p>Вартість квитка: {{ result.ticketPrice.toFixed(2) }} грн</p>
+    </div>
+  </ng-container>
+
+  <ng-template #noAccess>
+    <p class="text-center">У вас немає доступу до цієї сторінки. Будь ласка, увійдіть у систему.</p>
+  </ng-template>
+</div>

@@ -10,6 +10,9 @@ public class Route
 
     public int TripDurationMinutes { get; set; }
 
+    public double RouteLengthKm { get; set; }
+    
+
     public ICollection<RouteStop> RouteStops { get; set; } = new List<RouteStop>();
 
     public ICollection<LoadStatSet> StatSets { get; set; } = new List<LoadStatSet>();

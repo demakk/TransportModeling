@@ -10,6 +10,8 @@ public class TransportDbContext : DbContext
     public DbSet<RouteStop> RouteStops => Set<RouteStop>();
     public DbSet<LoadStatSet> LoadStatSets => Set<LoadStatSet>();
     public DbSet<LoadStat> LoadStats => Set<LoadStat>();
+    
+    public DbSet<VehicleType> VehicleTypes => Set<VehicleType>();
 
     public TransportDbContext(DbContextOptions<TransportDbContext> options) : base(options) {}
 
@@ -37,6 +39,7 @@ public class TransportDbContext : DbContext
         e.Property(x => x.Name).HasColumnName("name");
         e.Property(x => x.SocialImportanceIndex).HasColumnName("social_importance_index");
         e.Property(x => x.TripDurationMinutes).HasColumnName("trip_duration_minutes");
+        e.Property(x => x.RouteLengthKm).HasColumnName("route_length_km");
     });
 
     // route_stops
@@ -74,6 +77,9 @@ public class TransportDbContext : DbContext
         e.Property(x => x.EndDate).HasColumnName("end_date");
         e.Property(x => x.DurationMinutes).HasColumnName("duration_minutes");
         e.Property(x => x.DayType).HasColumnName("day_type");
+        e.Property(x => x.MaxIntervalMinutes).HasColumnName("max_interval_minutes");
+        e.Property(x => x.AvgLoad).HasColumnName("max_avg_load");
+        e.Property(x => x.MaxPeakLoad).HasColumnName("max_peak_load");
 
         e.HasOne(x => x.Route)
          .WithMany(r => r.StatSets)
@@ -90,6 +96,7 @@ public class TransportDbContext : DbContext
         e.Property(x => x.StatSetId).HasColumnName("stat_set_id");
         e.Property(x => x.StopId).HasColumnName("stop_id");
         e.Property(x => x.TotalPassengers).HasColumnName("total_passengers");
+        e.Property(x => x.Boardings).HasColumnName("boardings");
 
         e.HasOne(x => x.StatSet)
          .WithMany(s => s.Stats)
@@ -98,6 +105,20 @@ public class TransportDbContext : DbContext
         e.HasOne(x => x.Stop)
          .WithMany()
          .HasForeignKey(x => x.StopId);
+    });
+
+
+
+    modelBuilder.Entity<VehicleType>(e =>
+    {
+        e.ToTable("vehicle_types");
+
+        e.HasKey(x => x.Id);
+        e.Property(x => x.Id).HasColumnName("id");
+        e.Property(x => x.Name).HasColumnName("name");
+        e.Property(x => x.Capacity).HasColumnName("capacity");
+        e.Property(x => x.CostPerKm).HasColumnName("cost_per_km");
+        e.Property(x => x.Notes).HasColumnName("notes");
     });
 }
 

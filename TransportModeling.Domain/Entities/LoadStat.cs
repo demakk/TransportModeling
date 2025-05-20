@@ -10,5 +10,7 @@ public class LoadStat
     public int StopId { get; set; }
     public Stop Stop { get; set; } = null!;
 
+    public int Boardings { get; set; }
+
     public int TotalPassengers { get; set; }
 }

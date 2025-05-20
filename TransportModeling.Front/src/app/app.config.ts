@@ -7,6 +7,7 @@ import { RegisterPageComponent } from './pages/register-page/register-page.compo
 import { provideHttpClient } from '@angular/common/http';
 import { UserPageComponent } from './pages/user-page/user-page.component';
 import { TransportLoadComponent } from './pages/transport-load/transport-load.component';
+import { EconomicModelingComponent } from './pages/economic-modeling/economic-modeling.component';
 
 
 export const routes: Routes = [
@@ -14,7 +15,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'register', component: RegisterPageComponent },
   { path: 'user', component: UserPageComponent },
-  {path: 'transport-load', component: TransportLoadComponent}
+  {path: 'transport-load', component: TransportLoadComponent},
+  {path: 'economic-modeling', component: EconomicModelingComponent}
 ];
 
 export const appConfig: ApplicationConfig = {

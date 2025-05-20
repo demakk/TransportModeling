@@ -70,6 +70,8 @@ canAccess(): boolean {
 
   chart: Chart | null = null;
 
+  readonly STORAGE_KEY = 'transport_config';
+
   addVehicleToQueue() {
     const selected = this.vehicleTypes.find(v => v.id === this.newVehicleType);
     if (selected) {
@@ -179,4 +181,32 @@ canAccess(): boolean {
     });
   }
   
+
+  saveUserSettings() {
+    const config = {
+      routeName: this.routeName,
+      selectedPeriod: this.selectedPeriod,
+      vehicleQueue: this.vehicleQueue
+    };
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(config));
+  }
+  
+
+  loadUserSettings() {
+    const saved = localStorage.getItem(this.STORAGE_KEY);
+    if (saved) {
+      try {
+        const config = JSON.parse(saved);
+        this.routeName = config.routeName || '';
+        this.selectedPeriod = config.selectedPeriod || '';
+        this.vehicleQueue = config.vehicleQueue || [];
+      } catch (err) {
+        console.warn('❌ Не вдалося завантажити конфігурацію користувача:', err);
+      }
+    }
+  }
+  
+
+
+
 }

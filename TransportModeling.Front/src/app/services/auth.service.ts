@@ -30,6 +30,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(STORAGE_KEYS.authToken);
+    localStorage.removeItem('transport_config');
   }
 
   getToken(): string | null {
