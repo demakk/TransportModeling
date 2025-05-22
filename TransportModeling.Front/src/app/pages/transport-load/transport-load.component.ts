@@ -6,6 +6,7 @@ import { Chart, registerables } from 'chart.js';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { AUTH_ENDPOINTS } from '../../config/constants';
+import { FooterComponent } from '../../components/footer/footer.component';
 
 Chart.register(...registerables);
 
@@ -30,7 +31,7 @@ interface ModelingResult {
 @Component({
   selector: 'app-transport-load',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './transport-load.component.html',
   styleUrls: ['./transport-load.component.scss']
 })

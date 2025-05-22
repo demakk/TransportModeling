@@ -4,11 +4,12 @@ import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { UserPageMainPartComponent } from '../../components/user-page-main-part/user-page-main-part.component';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { FooterComponent } from '../../components/footer/footer.component';
 
 @Component({
   selector: 'app-user-page',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, UserPageMainPartComponent],
+  imports: [CommonModule, NavbarComponent, UserPageMainPartComponent, FooterComponent],
   templateUrl: './user-page.component.html',
   styleUrls: ['./user-page.component.scss']
 })
@@ -28,6 +29,7 @@ export class UserPageComponent {
 
   selectModeling() {
     this.selectedBlock = 'modeling';
+    this.router.navigate(['/economic-modeling']);
   }
 
   canAccessMainParts(): boolean {

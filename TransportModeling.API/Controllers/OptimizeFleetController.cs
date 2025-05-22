@@ -5,7 +5,7 @@ using TransportModeling.Application.Interfaces;
 namespace TransportModeling.API.Controllers;
 
 [ApiController]
-[Route("api/transport/optimize")]
+[Route("api/[controller]")]
 public class OptimizeFleetController : ControllerBase
 {
     private readonly IEconomicModelingService _modelingService;

@@ -6,31 +6,51 @@ import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { HttpClient } from '@angular/common/http';
 import { AUTH_ENDPOINTS } from '../../config/constants';
 import { AuthService } from '../../services/auth.service';
+import { Chart, registerables } from 'chart.js';
+import { FooterComponent } from '../../components/footer/footer.component';
+
+Chart.register(...registerables);
 
 interface VehicleType {
   id: string;
   name: string;
   capacity: number;
-  costPerKm?: number;
   count: number;
 }
 
-interface OptimizationResult {
-  optimalConfig: {
-    count: number;
-    typeName: string;
-    capacity: number;
-  }[];
+interface StopLoadDto {
+  orderInRoute: number;
+  stopName: string;
+  totalPassengers: number;
+  availableCapacity: number;
+  loadPercentage: number;
+}
+
+interface OptimalConfigItemDto {
+  typeName: string;
+  count: number;
+  capacity: number;
+}
+
+interface OptimizeFleetOptionDto {
+  optimalConfig: OptimalConfigItemDto[];
   avgLoad: number;
   maxLoad: number;
   interval: number;
   ticketPrice: number;
+  stopsLoad: StopLoadDto[];
+}
+
+interface OptimizeFleetResultDto {
+  routeName: string;
+  period: string;
+  options: OptimizeFleetOptionDto[];
 }
 
 @Component({
   selector: 'app-economic-modeling',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './economic-modeling.component.html',
   styleUrls: ['./economic-modeling.component.scss']
 })
@@ -53,7 +73,10 @@ export class EconomicModelingComponent {
     { id: 'large', name: 'Великий автобус', capacity: 80, count: 0 },
   ];
 
-  result: OptimizationResult | null = null;
+  result: OptimizeFleetResultDto | null = null;
+  intervalText: string = '';
+  chart: Chart | null = null;
+  selectedGraphOption: OptimizeFleetOptionDto | null = null;
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.role = this.authService.getUserRole();
@@ -64,11 +87,11 @@ export class EconomicModelingComponent {
   }
 
   runOptimization() {
-    const busQueue = this.vehicleTypes
+    const busTypes = this.vehicleTypes
       .filter(v => v.count > 0)
-      .flatMap(v => Array(v.count).fill({ capacity: v.capacity }));
+      .map(v => ({ capacity: v.capacity, maxCount: v.count }));
 
-    if (busQueue.length === 0) {
+    if (busTypes.length === 0) {
       alert('Введіть кількість хоча б одного типу автобуса!');
       return;
     }
@@ -76,17 +99,84 @@ export class EconomicModelingComponent {
     const payload = {
       routeName: this.routeName,
       periodCode: this.selectedPeriod,
-      busQueue
+      busTypes
     };
 
-    this.http.post<OptimizationResult>(AUTH_ENDPOINTS.buildGraph, payload).subscribe({
+    this.http.post<OptimizeFleetResultDto>(AUTH_ENDPOINTS.optimizeFleet, payload).subscribe({
       next: (res) => {
         this.result = res;
+        this.selectedGraphOption = null;
+        this.clearGraph();
       },
       error: (err) => {
         console.error('❌ Помилка оптимізації:', err);
         alert('Помилка при запиті до бекенду');
       }
     });
+  }
+
+  viewGraph(option: OptimizeFleetOptionDto) {
+    this.selectedGraphOption = option;
+      setTimeout(() => {
+    this.renderGraph(option.stopsLoad, option.interval);
+  }, 0);
+    this.renderGraph(option.stopsLoad, option.interval);
+  }
+
+  renderGraph(stopsLoad: StopLoadDto[], intervalMinutes: number) {
+    const container = document.querySelector('#chartContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const scrollWrap = document.createElement('div');
+    scrollWrap.style.overflowX = 'auto';
+    scrollWrap.style.width = '100%';
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'loadChart';
+    canvas.style.width = '75vw';
+    canvas.width = window.innerWidth * 0.75;
+    canvas.height = 300;
+
+    scrollWrap.appendChild(canvas);
+    container.appendChild(scrollWrap);
+
+    const labels = stopsLoad.map(s => `${s.orderInRoute}. ${s.stopName}`);
+    const data = stopsLoad.map(s => Math.round(s.loadPercentage));
+    const colors = data.map(p =>
+      p < 70 ? '#10B981' : p < 90 ? '#FACC15' : p < 110 ? '#EF4444' : '#B91C1C');
+
+    this.intervalText = `Інтервал між відправленнями: ${intervalMinutes.toFixed(1)} хв`;
+
+    this.chart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Завантаження (%)', data, backgroundColor: colors }]
+      },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 150,
+            title: { display: true, text: '% від загальної місткості' }
+          },
+          x: {
+            ticks: { font: { size: 10 }, maxRotation: 30, minRotation: 30 }
+          }
+        }
+      }
+    });
+  }
+
+  clearGraph() {
+    const container = document.querySelector('#chartContainer');
+    if (container) container.innerHTML = '';
+    this.chart?.destroy();
+    this.chart = null;
+    this.intervalText = '';
   }
 }

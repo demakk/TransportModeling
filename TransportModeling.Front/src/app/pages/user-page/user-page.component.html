@@ -8,7 +8,7 @@
     [buttonText]="'Переглянути графіки'"
     [isSelected]="selectedBlock === 'graphs'"
     (clicked)="selectGraphs()"
-    [imageUrl]="'assets/graph-placeholder.svg'">
+    [imageUrl]="'/logos/graph-logo.png'">
   </app-user-page-main-part>
 
   <app-user-page-main-part
@@ -17,10 +17,12 @@
     [buttonText]="'Перейти до моделювання'"
     [isSelected]="selectedBlock === 'modeling'"
     (clicked)="selectModeling()"
-    [imageUrl]="'assets/modeling-placeholder.svg'">
+    [imageUrl]="'/logos/ticket-logo.png'">
   </app-user-page-main-part>
   </ng-container>
   <ng-template #noAccess>
     <p>У вас немає доступу до цих функцій.</p>
   </ng-template>
 </div>
+
+<app-footer></app-footer>

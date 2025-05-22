@@ -26,6 +26,10 @@ export class NavbarComponent {
     alert('Функція редагування профілю в розробці');
   }
 
+goToUserPage() {
+  this.router.navigate(['/user']);
+}
+
   backToHome() {
     this.router.navigate(['/']);
   }

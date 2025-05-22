@@ -31,17 +31,37 @@
       <button (click)="runOptimization()">Почати моделювання</button>
     </div>
 
-    <div *ngIf="result" class="interval-box">
-      <p><strong>Оптимальна конфігурація:</strong></p>
-      <ul>
-        <li *ngFor="let r of result.optimalConfig">
-          {{ r.count }} × {{ r.typeName }} ({{ r.capacity }} місць)
-        </li>
-      </ul>
-      <p>Середнє завантаження: {{ result.avgLoad }}%</p>
-      <p>Максимальне завантаження: {{ result.maxLoad }}%</p>
-      <p>Інтервал: {{ result.interval }} хв</p>
-      <p>Вартість квитка: {{ result.ticketPrice.toFixed(2) }} грн</p>
+   <div *ngIf="result && result.options && result.options.length > 0" style="margin-top: 40px;">
+  <h2 class="text-center">Найкращі варіанти конфігурацій</h2>
+<div class="result-cards-grid">
+  <div class="result-card" *ngFor="let option of result.options; let idx = index" [ngClass]="{ 'active-card': option === selectedGraphOption }">
+    <h4>Варіант {{ idx + 1 }}</h4>
+    <ul>
+      <li *ngFor="let item of option.optimalConfig">
+        {{ item?.count ?? '?' }} × {{ item?.typeName ?? '?' }} ({{ item?.capacity ?? '?' }} місць)
+      </li>
+    </ul>
+    <p><strong>Ціна квитка:</strong> {{ option.ticketPrice?.toFixed(2) ?? '—' }} грн</p>
+    <button (click)="viewGraph(option)">Детальніше</button>
+  </div>
+</div>
+</div>
+
+    <div *ngIf="intervalText" class="interval-box">
+      {{ intervalText }}
+    </div>
+
+    <div *ngIf="selectedGraphOption" style="margin-top: 40px;">
+      <h2 class="text-center">Графік завантаженості по зупинках</h2>
+      <div style="display: flex; gap: 16px; font-size: 14px; margin-bottom: 12px;">
+        <div><span style="color: #10B981;">●</span> Нормальне (до 70%)</div>
+        <div><span style="color: #FACC15;">●</span> Підвищене (70–89%)</div>
+        <div><span style="color: #EF4444;">●</span> Перевантаження (90–109%)</div>
+        <div><span style="color: #B91C1C;">●</span> Критичне (110%+)</div>
+      </div>
+      <div id="chartContainer" style="margin-top: 40px; width: 100%; max-width: none; padding: 0;">
+        <!-- canvas вставляється динамічно -->
+      </div>
     </div>
   </ng-container>
 
@@ -49,3 +69,5 @@
     <p class="text-center">У вас немає доступу до цієї сторінки. Будь ласка, увійдіть у систему.</p>
   </ng-template>
 </div>
+
+<app-footer></app-footer>
