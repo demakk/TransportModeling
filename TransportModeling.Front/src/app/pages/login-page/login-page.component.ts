@@ -18,18 +18,15 @@ import { FooterComponent } from '../../components/footer/footer.component';
 export class LoginPageComponent {
   username = '';
   password = '';
-  errorMessage: string = '';
+
 
   constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {}
 
   login() {
-    this.errorMessage = '';
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
         this.router.navigate(['/user']);
-      },
-      error: (err) => {
-        this.toastService.show('Помилка авторизації. ' + err.error);
+        this.toastService.show(`Ласкаво просимо, ${this.username}!`);
       }
     });
   }

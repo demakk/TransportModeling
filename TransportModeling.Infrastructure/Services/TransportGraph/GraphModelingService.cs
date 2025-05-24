@@ -20,7 +20,7 @@ public async Task<ModelingResultDto> CalculateAsync(ModelingRequestDto request)
     // 1. Знаходимо маршрут
     var route = await _db.Routes
         .FirstOrDefaultAsync(r => r.Name == request.RouteName)
-        ?? throw new InvalidOperationException("Маршрут не знайдено");
+        ?? throw new KeyNotFoundException("Маршрут не знайдено");
 
     // 2. Знаходимо набір статистики по періоду
     var statSet = await _db.LoadStatSets
@@ -28,7 +28,7 @@ public async Task<ModelingResultDto> CalculateAsync(ModelingRequestDto request)
         .FirstOrDefaultAsync(s =>
             s.RouteId == route.RouteId &&
             s.PeriodCode == request.PeriodCode)
-        ?? throw new InvalidOperationException("Статистика не знайдена для заданого періоду");
+        ?? throw new KeyNotFoundException("Для цього періоду відсутня статистика");
 
     // 3. Витягуємо зупинки маршруту в порядку
     var routeStops = await _db.RouteStops

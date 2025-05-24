@@ -7,6 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 import { AUTH_ENDPOINTS } from '../../config/constants';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { ToastService } from '../../services/toast.service';
+import { RouteShortDto } from '../../models/routes.model';
 
 Chart.register(...registerables);
 
@@ -39,13 +41,14 @@ export class TransportLoadComponent {
   role: string | null = null;
   intervalText: string = '';
 
-
+  routes: RouteShortDto[] = [];
+  isLoadingRoutes: boolean = false;
 
 canAccess(): boolean {
   return this.role === 'user' || this.role === 'admin';
 }
 
-  constructor(private http: HttpClient, private authService: AuthService) {
+  constructor(private http: HttpClient, private authService: AuthService, private toast: ToastService) {
     this.role = this.authService.getUserRole();
   }
 
@@ -71,6 +74,24 @@ canAccess(): boolean {
 
   chart: Chart | null = null;
 
+  ngOnInit(): void {
+    this.loadRoutes();
+  }
+  loadRoutes() {
+    this.isLoadingRoutes = true;
+    this.http.get<RouteShortDto[]>(AUTH_ENDPOINTS.getRoutes).subscribe({
+      next: res => {
+        this.routes = res;
+        this.isLoadingRoutes = false;
+  
+        // Якщо активний маршрут ще не встановлено — обираємо перший
+        if (!this.routeName && res.length > 0) {
+          this.routeName = res[0].name;
+        }
+      }
+    });
+  }
+
   readonly STORAGE_KEY = 'transport_config';
 
   addVehicleToQueue() {
@@ -86,7 +107,7 @@ canAccess(): boolean {
 
   buildGraph() {
     if (this.vehicleQueue.length === 0) {
-      alert('Додайте хоча б один автобус у чергу!');
+      this.toast.show('Додайте хоча б один автобус у чергу!');
       return;
     }
 
@@ -97,11 +118,7 @@ canAccess(): boolean {
     };
 
     this.http.post<ModelingResult>(AUTH_ENDPOINTS.buildGraph, payload).subscribe({
-      next: (result) => this.renderGraph(result),
-      error: (err) => {
-        console.error('❌ Помилка при запиті:', err);
-        alert('Помилка при запиті до бекенду');
-      }
+      next: (result) => this.renderGraph(result)
     });
   }
 

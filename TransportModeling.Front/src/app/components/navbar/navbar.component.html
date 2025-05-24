@@ -1,16 +1,17 @@
 <nav class="navbar">
-  <div class="logo" (click)="goToUserPage()">
-    <img src="/logos/bus-logo.svg" alt="Логотип" />
+  <div class="navbar-left" (click)="goToUserPage()">
+    <img src="/logos/bus-logo.svg" alt="Логотип" class="logo-icon" />
+    <span class="app-title">Transport Modeling</span>
   </div>
 
   <div class="nav-buttons">
     <ng-container *ngIf="isAuthenticated; else guestMode">
-      <button (click)="editProfile()">Змінити дані</button>
-      <button (click)="logout()">Вийти</button>
+      <button class="nav-btn" (click)="editProfile()">Змінити дані</button>
+      <button class="nav-btn" (click)="logout()">Вийти</button>
     </ng-container>
 
     <ng-template #guestMode>
-      <button (click)="backToHome()">В початок</button>
+      <button class="nav-btn" (click)="backToHome()">В початок</button>
     </ng-template>
   </div>
 </nav>

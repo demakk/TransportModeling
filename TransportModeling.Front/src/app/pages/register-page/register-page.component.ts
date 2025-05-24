@@ -19,15 +19,13 @@ export class RegisterPageComponent {
   password = '';
   confirmPassword = '';
 
-  errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {}
 
   register() {
-    this.errorMessage = '';
 
     if (this.password !== this.confirmPassword) {
-      this.toastService.show('Паролі не співпадають.');
+      this.toastService.show('Паролі не співпадають');
       return;
     }
 
@@ -35,13 +33,7 @@ export class RegisterPageComponent {
       next: (response) => {
         localStorage.setItem('auth_token', response.token);
         this.router.navigate(['/user']);
-      },
-      error: (err) => {
-        if (err.status === 409) {
-          this.toastService.show('Користувач з таким ім\'ям вже існує.');
-        } else {
-          this.toastService.show('Сталася невідома помилка під час реєстрації');
-        }
+        this.toastService.show(`Ласкаво просимо, ${this.username}!`);
       }
     });
   }

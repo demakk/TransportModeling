@@ -104,3 +104,56 @@
   align-self: start;
   margin-top: auto;
 }
+
+
+.norms-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 30px;
+  gap: 16px;
+}
+
+.norms-button {
+  padding: 12px 24px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--accent-color-hover);
+  }
+}
+
+.norms-box {
+  background-color: #DBEAFE;
+  color: #1E3A8A;
+  padding: 20px 28px;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  font-size: 14px;
+  min-width: 360px;
+  text-align: left;
+  line-height: 1.8;
+}
+
+.norms-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.norms-line {
+  margin-bottom: 8px;
+}
+
+.label {
+  font-weight: 600;
+  margin-right: 4px;
+}

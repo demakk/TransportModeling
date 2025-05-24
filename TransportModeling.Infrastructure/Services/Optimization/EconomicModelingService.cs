@@ -28,7 +28,7 @@ public class EconomicModelingService : IEconomicModelingService
                 s.RouteId == route.RouteId &&
                 s.PeriodCode == request.PeriodCode);
 
-        if (statSet == null) throw new Exception("Немає даних для цього періоду");
+        if (statSet == null) throw new KeyNotFoundException("Для цього періоду відсутня статистика");
 
         var loadStats = await _context.LoadStats
             .Where(ls => ls.StatSetId == statSet.StatSetId)
@@ -134,6 +134,26 @@ public class EconomicModelingService : IEconomicModelingService
             .ToList();
 
         return result;
+    }
+ 
+ 
+    public async Task<RouteNormsDto?> GetRouteNormsAsync(string routeName, string periodCode)
+    {
+        var route = await _context.Routes.FirstOrDefaultAsync(r => r.Name == routeName)
+                    ?? throw new KeyNotFoundException("Маршрут не знайдено");
+
+        var statSet = await _context.LoadStatSets
+                          .FirstOrDefaultAsync(s => s.RouteId == route.RouteId && s.PeriodCode == periodCode)
+                      ?? throw new KeyNotFoundException("Для цього періоду відсутня статистика");
+
+        return new RouteNormsDto
+        {
+            RouteName = route.Name,
+            PeriodCode = statSet.PeriodCode,
+            MaxAvgLoad = statSet.AvgLoad,
+            MaxPeakLoad = statSet.MaxPeakLoad,
+            MaxIntervalMinutes = statSet.MaxIntervalMinutes
+        };
     }
 
 }

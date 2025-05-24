@@ -1,0 +1,30 @@
+.footer {
+  background-color: #E5E7EB;
+  padding: 25px 0;
+  font-size: 14px;
+  color: var(--secondary-color);
+  
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer a {
+  color: var(--secondary-color);
+  text-decoration: none;
+  margin-left: 16px;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: var(--accent-color);
+  }
+}
+
+.footer-left p {
+  margin: 0;
+}

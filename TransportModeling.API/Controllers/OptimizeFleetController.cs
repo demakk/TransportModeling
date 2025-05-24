@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TransportModeling.Application.DTOs.Transport.GraphConstructor;
 using TransportModeling.Application.DTOs.Transport.Optimization;
 using TransportModeling.Application.Interfaces;
 
@@ -34,4 +35,16 @@ public class OptimizeFleetController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+    
+    
+    [HttpGet("norms")]
+    public async Task<ActionResult<RouteNormsDto>> GetNorms(
+        [FromQuery] string routeName,
+        [FromQuery] string periodCode)
+    {
+        RouteNormsDto? norms = await _modelingService.GetRouteNormsAsync(routeName, periodCode);
+        if (norms == null) return NotFound("Норми не знайдено");
+        return Ok(norms);
+    }
+
 }

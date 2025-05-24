@@ -28,7 +28,7 @@ public class AuthService : IAuthService
     {
         
         if (await _db.Users.AnyAsync(u => u.Username == request.Username))
-            return null;
+            throw new InvalidOperationException("Користувач з таким ім'ям вже існує");
 
         var user = new User
         {
@@ -52,13 +52,11 @@ public class AuthService : IAuthService
     public async Task<string?> LoginAsync(LoginRequest request)
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-        if (user == null)
-            return null;
+        if (user == null) throw new InvalidOperationException("Користувача з таким ім'ям не існує");
 
         var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
-        if (result != PasswordVerificationResult.Success)
-            return null;
-
+        if (result != PasswordVerificationResult.Success) throw new InvalidOperationException("Невірний логін або пароль");
+        
         return _tokenService.CreateToken(user.Id.ToString(), user.Username, user.Role);
     }
 }

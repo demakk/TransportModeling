@@ -1,13 +1,15 @@
 <app-navbar></app-navbar>
 
 <div class="container">
-  <h1 class="text-center">Економічне моделювання</h1>
+  <h1 class="text-center">Моделювання випуску ТЗ</h1>
 
   <ng-container *ngIf="canAccess(); else noAccess">
     <div class="form-grid-2">
       <div class="form-item">
-        <label for="routeInput">Маршрут</label>
-        <input id="routeInput" type="text" [(ngModel)]="routeName" placeholder="Наприклад: A41" />
+        <label for="routeSelect">Маршрут</label>
+        <select id="routeSelect" [(ngModel)]="routeName">
+          <option *ngFor="let r of routes" [value]="r.name">{{ r.name }}</option>
+        </select>
       </div>
 
       <div class="form-item">
@@ -16,7 +18,30 @@
           <option *ngFor="let period of periods" [value]="period.value">{{ period.label }}</option>
         </select>
       </div>
+
     </div>
+
+    <div class="norms-wrapper">
+    <button class="norms-button" (click)="toggleNorms()">
+      {{ routeNormsVisible ? 'Приховати норми' : 'Переглянути норми для цього маршруту' }}
+    </button>
+
+    <div *ngIf="routeNormsVisible && routeNorms" class="norms-box">
+      <div class="norms-title">
+        Норми для {{ routeNorms.routeName }} / {{ routeNorms.periodCode }}:
+      </div>
+      <div class="norms-line">
+        <span class="label">Сер. навантаження:</span> {{ routeNorms.maxAvgLoad }}%
+      </div>
+      <div class="norms-line">
+        <span class="label">Пікове навантаження:</span> {{ routeNorms.maxPeakLoad }}%
+      </div>
+      <div class="norms-line">
+        <span class="label">Інтервал:</span> {{ routeNorms.maxIntervalMinutes }} хв
+      </div>
+    </div>
+  </div>
+
 
     <h3>Кількість автобусів по типах:</h3>
     <div class="vehicle-grid">
@@ -47,9 +72,11 @@
 </div>
 </div>
 
-    <div *ngIf="intervalText" class="interval-box">
-      {{ intervalText }}
-    </div>
+<div *ngIf="selectedGraphOption" class="interval-box">
+  <div><strong>Інтервал між відправленнями:</strong> {{ selectedGraphOption.interval.toFixed(1) }} хв</div>
+  <div><strong>Середня завантаженість:</strong> {{ selectedGraphOption.avgLoad.toFixed(1) }}%</div>
+  <div><strong>Максимальна завантаженість:</strong> {{ selectedGraphOption.maxLoad.toFixed(1) }}%</div>
+</div>
 
     <div *ngIf="selectedGraphOption" style="margin-top: 40px;">
       <h2 class="text-center">Графік завантаженості по зупинках</h2>

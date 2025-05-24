@@ -4,10 +4,11 @@ import { Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { RegisterPageComponent } from './pages/register-page/register-page.component';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { UserPageComponent } from './pages/user-page/user-page.component';
 import { TransportLoadComponent } from './pages/transport-load/transport-load.component';
 import { EconomicModelingComponent } from './pages/economic-modeling/economic-modeling.component';
+import { httpErrorInterceptor } from './interceptors/http-error.interceptor';
 
 
 export const routes: Routes = [
@@ -22,5 +23,5 @@ export const routes: Routes = [
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
   provideRouter(routes),
-  provideHttpClient()]
+  provideHttpClient(withInterceptors([httpErrorInterceptor]))]
 };

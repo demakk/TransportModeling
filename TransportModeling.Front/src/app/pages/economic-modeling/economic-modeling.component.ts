@@ -8,6 +8,8 @@ import { AUTH_ENDPOINTS } from '../../config/constants';
 import { AuthService } from '../../services/auth.service';
 import { Chart, registerables } from 'chart.js';
 import { FooterComponent } from '../../components/footer/footer.component';
+import { ToastService } from '../../services/toast.service';
+import { RouteShortDto } from '../../models/routes.model';
 
 Chart.register(...registerables);
 
@@ -47,6 +49,14 @@ interface OptimizeFleetResultDto {
   options: OptimizeFleetOptionDto[];
 }
 
+interface RouteNormsDto {
+  routeName: string;
+  periodCode: string;
+  maxAvgLoad: number;
+  maxPeakLoad: number;
+  maxIntervalMinutes: number;
+}
+
 @Component({
   selector: 'app-economic-modeling',
   standalone: true,
@@ -55,9 +65,12 @@ interface OptimizeFleetResultDto {
   styleUrls: ['./economic-modeling.component.scss']
 })
 export class EconomicModelingComponent {
-  routeName: string = 'A41';
+  routeName: string = 'А41';
   selectedPeriod: string = 'MorningPeak';
   role: string | null = null;
+  private normsCache = new Map<string, RouteNormsDto>();
+  routes: RouteShortDto[] = [];
+  isLoadingRoutes: boolean = false;
 
   periods = [
     { value: 'MorningPeak', label: 'Ранковий пік (2 год)' },
@@ -73,12 +86,16 @@ export class EconomicModelingComponent {
     { id: 'large', name: 'Великий автобус', capacity: 80, count: 0 },
   ];
 
+  routeNorms: RouteNormsDto | null = null;
+  normsError: string | null = null;
+
   result: OptimizeFleetResultDto | null = null;
   intervalText: string = '';
   chart: Chart | null = null;
   selectedGraphOption: OptimizeFleetOptionDto | null = null;
+  
 
-  constructor(private http: HttpClient, private authService: AuthService) {
+  constructor(private http: HttpClient, private authService: AuthService, private toast: ToastService) {
     this.role = this.authService.getUserRole();
   }
 
@@ -86,13 +103,80 @@ export class EconomicModelingComponent {
     return this.role === 'user' || this.role === 'admin';
   }
 
+  loadNorms() {
+  this.routeNorms = null;
+  this.normsError = null;
+
+  const params = {
+    routeName: this.routeName,
+    periodCode: this.selectedPeriod
+  };
+
+  this.http.get<RouteNormsDto>(AUTH_ENDPOINTS.getNormsForRoutePeriod, { params }).subscribe({
+    next: res => {
+      this.routeNorms = res;
+    }
+  });
+}
+
+routeNormsVisible: boolean = false;
+
+ngOnInit(): void {
+  this.loadRoutes();
+}
+loadRoutes() {
+  this.isLoadingRoutes = true;
+  this.http.get<RouteShortDto[]>(AUTH_ENDPOINTS.getRoutes).subscribe({
+    next: res => {
+      this.routes = res;
+      this.isLoadingRoutes = false;
+
+      // Якщо активний маршрут ще не встановлено — обираємо перший
+      if (!this.routeName && res.length > 0) {
+        this.routeName = res[0].name;
+      }
+    }
+  });
+}
+
+toggleNorms() {
+  if (this.routeNormsVisible) {
+    this.routeNormsVisible = false;
+    this.routeNorms = null;
+    return;
+  }
+
+  const cacheKey = `${this.routeName}|${this.selectedPeriod}`;
+
+  if (this.normsCache.has(cacheKey)) {
+    this.routeNorms = this.normsCache.get(cacheKey)!;
+    this.routeNormsVisible = true;
+    return;
+  }
+
+  this.routeNorms = null;
+  const params = {
+    routeName: this.routeName,
+    periodCode: this.selectedPeriod
+  };
+
+  this.http.get<RouteNormsDto>(AUTH_ENDPOINTS.getNormsForRoutePeriod, { params }).subscribe({
+    next: res => {
+      this.routeNorms = res;
+      this.routeNormsVisible = true;
+      this.normsCache.set(cacheKey, res);
+    }
+  });
+}
+
+
   runOptimization() {
     const busTypes = this.vehicleTypes
       .filter(v => v.count > 0)
       .map(v => ({ capacity: v.capacity, maxCount: v.count }));
 
     if (busTypes.length === 0) {
-      alert('Введіть кількість хоча б одного типу автобуса!');
+      this.toast.show('Введіть кількість хоча б одного типу автобуса!');
       return;
     }
 
@@ -107,10 +191,6 @@ export class EconomicModelingComponent {
         this.result = res;
         this.selectedGraphOption = null;
         this.clearGraph();
-      },
-      error: (err) => {
-        console.error('❌ Помилка оптимізації:', err);
-        alert('Помилка при запиті до бекенду');
       }
     });
   }

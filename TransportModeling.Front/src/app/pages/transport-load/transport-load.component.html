@@ -1,14 +1,16 @@
 <app-navbar></app-navbar>
 
 <div class="container">
-  <h1 class="text-center">Аналіз завантаженості транспорту</h1>
+  <h1 class="text-center">Візуалізація завантаженості транспорту</h1>
 
   <ng-container *ngIf="canAccess(); else noAccess">
 
     <div class="form-grid-2">
       <div class="form-item">
-        <label for="routeInput">Маршрут</label>
-        <input id="routeInput" type="text" [(ngModel)]="routeName" placeholder="Наприклад: A41" />
+        <label for="routeSelect">Маршрут</label>
+        <select id="routeSelect" [(ngModel)]="routeName">
+          <option *ngFor="let r of routes" [value]="r.name">{{ r.name }}</option>
+        </select>
       </div>
     
       <div class="form-item">

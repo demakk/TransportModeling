@@ -19,9 +19,7 @@ public class AuthController : ControllerBase
     public async Task <IActionResult> Register([FromBody] RegisterRequest request)
     {
         var token = await _authService.RegisterAsync(request);
-        if (token is null)
-            return Conflict("Користувач з таким ім'ям вже існує.");
-
+        
         return Ok(new RegisterResponse { Token = token });
     }
 
@@ -29,8 +27,6 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var token = await _authService.LoginAsync(request);
-        if (token == null)
-            return Unauthorized("Невірний логін або пароль.");
 
         return Ok(new LoginResponse { Token = token });
     }
